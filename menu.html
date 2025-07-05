@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bella Vista Restaurant - Digital Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .restaurant-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .restaurant-tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Search Bar */
+        .search-container {
+            background: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 0 15px;
+        }
+
+        .filter-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 8px 16px;
+            border-radius: 25px;
+            color: #666;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Category Navigation */
+        .category-nav {
+            background: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 140px;
+            z-index: 90;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 0 15px;
+        }
+
+        .category-card {
+            position: relative;
+            height: 100px;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+
+        .category-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 2;
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Menu Section */
+        .menu-section {
+            padding: 40px 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 0 15px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+        }
+
+        .item-content {
+            padding: 20px;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .item-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-left: auto;
+        }
+
+        .item-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .item-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .tag.spicy { color: #dc3545; }
+        .tag.vegetarian { color: #28a745; }
+        .tag.gluten-free { color: #ffc107; }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .restaurant-name {
+                font-size: 2rem;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .category-card {
+                height: 80px;
+            }
+
+            .category-icon {
+                font-size: 1.5rem;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="restaurant-name">Bella Vista</h1>
+            <p class="restaurant-tagline">Authentic Italian Cuisine & Fine Dining</p>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <div class="container">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search menu items..." id="searchInput">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="filters">
+        <div class="container">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All Items</button>
+                <button class="filter-btn" data-filter="vegetarian">🥗 Vegetarian</button>
+                <button class="filter-btn" data-filter="gluten-free">🌾 Gluten-Free</button>
+                <button class="filter-btn" data-filter="spicy">🌶️ Spicy</button>
+                <button class="filter-btn" data-filter="under-20">💰 Under $20</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-nav">
+        <div class="container">
+            <div class="category-grid">
+                <div class="category-card" data-category="starters">
+                    <div class="category-content">
+                        <div class="category-icon">🥗</div>
+                        <div class="category-name">Starters</div>
+                    </div>
+                </div>
+                <div class="category-card" data-category="mains">
+                    <div class="category-content">
+                        <div class="category-icon">🍝</div>
+                        <div class="category-name">Main Courses</div>
+                    </div>
+                </div>
+                <div class="category-card" data-category="desserts">
+                    <div class="category-content">
+                        <div class="category-icon">🍰</div>
+                        <div class="category-name">Desserts</div>
+                    </div>
+                </div>
+                <div class="category-card" data-category="drinks">
+                    <div class="category-content">
+                        <div class="category-icon">🍷</div>
+                        <div class="category-name">Beverages</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="menu-section">
+        <div class="container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading menu...</p>
+            </div>
+            <div id="menuContainer"></div>
+            <div class="no-results" id="noResults" style="display: none;">
+                <div class="no-results-icon">🔍</div>
+                <h3>No items found</h3>
+                <p>Try adjusting your search or filters</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sample Menu Data (this would typically be in a separate .js file)
+        const menuData = {
+            starters: [
+                {
+                    id: 1,
+                    name: "Bruschetta Classica",
+                    description: "Toasted bread topped with fresh tomatoes, basil, garlic, and extra virgin olive oil",
+                    price: 12.99,
+                    image: "https://images.unsplash.com/photo-1572441713132-51c75654db73?w=400&h=300&fit=crop",
+                    tags: ["vegetarian"],
+                    category: "starters"
+                },
+                {
+                    id: 2,
+                    name: "Calamari Fritti",
+                    description: "Crispy fried squid rings served with marinara sauce and lemon wedges",
+                    price: 16.99,
+                    image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&h=300&fit=crop",
+                    tags: ["spicy"],
+                    category: "starters"
+                },
+                {
+                    id: 3,
+                    name: "Antipasto Platter",
+                    description: "Selection of cured meats, cheeses, olives, and marinated vegetables",
+                    price: 24.99,
+                    image: "https://images.unsplash.com/photo-1559058922-cddc4df5ba65?w=400&h=300&fit=crop",
+                    tags: ["gluten-free"],
+                    category: "starters"
+                }
+            ],
+            mains: [
+                {
+                    id: 4,
+                    name: "Spaghetti Carbonara",
+                    description: "Classic Roman pasta with eggs, pancetta, pecorino cheese, and black pepper",
+                    price: 18.99,
+                    image: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=400&h=300&fit=crop",
+                    tags: [],
+                    category: "mains"
+                },
+                {
+                    id: 5,
+                    name: "Margherita Pizza",
+                    description: "Traditional pizza with tomato sauce, mozzarella, fresh basil, and olive oil",
+                    price: 16.99,
+                    image: "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=400&h=300&fit=crop",
+                    tags: ["vegetarian"],
+                    category: "mains"
+                },
+                {
+                    id: 6,
+                    name: "Osso Buco",
+                    description: "Slow-braised veal shanks with vegetables, white wine, and broth",
+                    price: 32.99,
+                    image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop",
+                    tags: ["gluten-free"],
+                    category: "mains"
+                },
+                {
+                    id: 7,
+                    name: "Risotto ai Funghi",
+                    description: "Creamy arborio rice with mixed wild mushrooms and parmesan cheese",
+                    price: 19.99,
+                    image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400&h=300&fit=crop",
+                    tags: ["vegetarian", "gluten-free"],
+                    category: "mains"
+                }
+            ],
+            desserts: [
+                {
+                    id: 8,
+                    name: "Tiramisu",
+                    description: "Classic Italian dessert with mascarpone, coffee-soaked ladyfingers, and cocoa",
+                    price: 8.99,
+                    image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&h=300&fit=crop",
+                    tags: [],
+                    category: "desserts"
+                },
+                {
+                    id: 9,
+                    name: "Panna Cotta",
+                    description: "Silky vanilla custard topped with fresh berry compote",
+                    price: 7.99,
+                    image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop",
+                    tags: ["gluten-free"],
+                    category: "desserts"
+                }
+            ],
+            drinks: [
+                {
+                    id: 10,
+                    name: "Chianti Classico",
+                    description: "Full-bodied red wine from Tuscany with notes of cherry and spice",
+                    price: 12.99,
+                    image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=300&fit=crop",
+                    tags: ["gluten-free"],
+                    category: "drinks"
+                },
+                {
+                    id: 11,
+                    name: "Limoncello",
+                    description: "Traditional Italian lemon liqueur, served chilled",
+                    price: 9.99,
+                    image: "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=300&fit=crop",
+                    tags: ["gluten-free"],
+                    category: "drinks"
+                }
+            ]
+        };
+
+        // Application State
+        let currentFilter = 'all';
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const menuContainer = document.getElementById('menuContainer');
+        const noResults = document.getElementById('noResults');
+        const loading = document.getElementById('loading');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const categoryCards = document.querySelectorAll('.category-card');
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMenu();
+            setupEventListeners();
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Search functionality
+            searchInput.addEventListener('input', handleSearch);
+            
+            // Filter buttons
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', handleFilterClick);
+            });
+            
+            // Category navigation
+            categoryCards.forEach(card => {
+                card.addEventListener('click', handleCategoryClick);
+            });
+        }
+
+        function handleSearch(e) {
+            searchQuery = e.target.value.toLowerCase();
+            renderMenu();
+        }
+
+        function handleFilterClick(e) {
+            filterBtns.forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            currentFilter = e.target.dataset.filter;
+            renderMenu();
+        }
+
+        function handleCategoryClick(e) {
+            const category = e.currentTarget.dataset.category;
+            currentCategory = category;
+            renderMenu();
+            
+            // Scroll to menu section
+            document.querySelector('.menu-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Menu Rendering
+        function renderMenu() {
+            loading.style.display = 'block';
+            menuContainer.innerHTML = '';
+            noResults.style.display = 'none';
+
+            setTimeout(() => {
+                const filteredItems = getFilteredItems();
+                
+                if (filteredItems.length === 0) {
+                    noResults.style.display = 'block';
+                    loading.style.display = 'none';
+                    return;
+                }
+
+                const groupedItems = groupItemsByCategory(filteredItems);
+                
+                Object.keys(groupedItems).forEach(category => {
+                    if (groupedItems[category].length > 0) {
+                        renderCategory(category, groupedItems[category]);
+                    }
+                });
+
+                loading.style.display = 'none';
+            }, 300);
+        }
+
+        function getFilteredItems() {
+            const allItems = Object.values(menuData).flat();
+            
+            return allItems.filter(item => {
+                // Category filter
+                if (currentCategory !== 'all' && item.category !== currentCategory) {
+                    return false;
+                }
+                
+                // Search filter
+                if (searchQuery && !item.name.toLowerCase().includes(searchQuery) && 
+                    !item.description.toLowerCase().includes(searchQuery)) {
+                    return false;
+                }
+                
+                // Tag filters
+                if (currentFilter === 'vegetarian' && !item.tags.includes('vegetarian')) {
+                    return false;
+                }
+                if (currentFilter === 'gluten-free' && !item.tags.includes('gluten-free')) {
+                    return false;
+                }
+                if (currentFilter === 'spicy' && !item.tags.includes('spicy')) {
+                    return false;
+                }
+                if (currentFilter === 'under-20' && item.price >= 20) {
+                    return false;
+                }
+                
+                return true;
+            });
+        }
+
+        function groupItemsByCategory(items) {
+            return items.reduce((groups, item) => {
+                const category = item.category;
+                if (!groups[category]) {
+                    groups[category] = [];
+                }
+                groups[category].push(item);
+                return groups;
+            }, {});
+        }
+
+        function renderCategory(category, items) {
+            const categoryTitle = category.charAt(0).toUpperCase() + category.slice(1);
+            
+            const categorySection = document.createElement('div');
+            categorySection.innerHTML = `
+                <h2 class="section-title">${categoryTitle}</h2>
+                <div class="menu-grid">
+                    ${items.map(item => renderMenuItem(item)).join('')}
+                </div>
+            `;
+            
+            menuContainer.appendChild(categorySection);
+        }
+
+        function renderMenuItem(item) {
+            const tags = item.tags.map(tag => 
+                `<span class="tag ${tag}">
+                    ${getTagIcon(tag)} ${tag.replace('-', ' ')}
+                </span>`
+            ).join('');
+
+            return `
+                <div class="menu-item">
+                    <img src="${item.image}" alt="${item.name}" class="item-image" loading="lazy">
+                    <div class="item-content">
+                        <div class="item-header">
+                            <h3 class="item-name">${item.name}</h3>
+                            <span class="item-price">$${item.price.toFixed(2)}</span>
+                        </div>
+                        <p class="item-description">${item.description}</p>
+                        <div class="item-tags">
+                            ${tags}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getTagIcon(tag) {
+            const icons = {
+                'vegetarian': '🥗',
+                'gluten-free': '🌾',
+                'spicy': '🌶️',
+                'vegan': '🌱'
+            };
+            return icons[tag] || '';
+        }
+
+        // Reset filters when clicking "All Items" in category nav
+        function resetFilters() {
+            currentCategory = 'all';
+            currentFilter = 'all';
+            searchQuery = '';
+            searchInput.value = '';
+            
+            filterBtns.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-filter="all"]').classList.add('active');
+            
+            renderMenu();
+        }
+    </script>
+</body>
+</html>
