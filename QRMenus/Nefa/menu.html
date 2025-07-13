@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>Bella Vista Restorant - Menu</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-overlay-pattern"></div>
+        
+        <div class="header-content">
+            <h1 class="restaurant-name">Nefa Patisserie</h1>
+            <p class="restaurant-tagline">El yapımı tatlılar, eşsiz tarifler, saf lezzet! Tatlıya dair tüm sınırları yeniden çiziyoruz</p>
+            <div class="social-media-links">
+                <a href="https://www.facebook.com/profile.php?id=61573389891531" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/nefa_patisserie/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tripadvisor.com/" target="_blank" aria-label="TripAdvisor"><i class="fab fa-tripadvisor"></i></a>
+            </div>
+        </div>
+        
+        <div class="scroll-indicator">
+            <div>Kaydırınız</div>
+            <div style="font-size: 1.2rem; margin-top: 5px;">↓</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-container">
+            <input type="text" class="search-bar" placeholder="Menüde ara..." id="searchInput">
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="categories-view" id="categoriesView">
+            <div class="categories-grid" id="categoriesGrid">
+                <!-- Categories will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="menu-section" id="menuSection">
+            <button class="back-button" onclick="showCategories()">← Kategorilere dön</button>
+            <h2 class="section-title" id="sectionTitle"></h2>
+            <div class="menu-items" id="menuItems">
+                <!-- Menu items will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <h3>Ürün bulunamadı</h3>
+            <p>Farklı anahtar kelime deneyiniz</p>
+        </div>
+    </div>
+
+    <!-- Photo Modal -->
+    <div class="photo-modal" id="photoModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePhotoModal()">&times;</span>
+            <img class="modal-image" id="modalImage" src="" alt="">
+        </div>
+    </div>
+
+    <script src="menu.js"></script>
+</body>
+</html>
