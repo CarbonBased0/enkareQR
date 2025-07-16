@@ -21,29 +21,40 @@ const categoryImages = {
 
 function getRestaurantId() {
     const pathSegments = window.location.pathname.split('/');
-    // Extract restaurant name from path like '/QRMenus/Nefa/menu.html' -> 'Nefa'
+    // Extract restaurant name from path like '/QRMenus/Template/menu.html'
     const restaurantIndex = pathSegments.findIndex(segment => segment === 'QRMenus');
     if (restaurantIndex !== -1 && restaurantIndex + 1 < pathSegments.length) {
         return pathSegments[restaurantIndex + 1];
     }
     
-    // Fallback: use ACCESS_KEY if path parsing fails
     return ACCESS_PART;
 }
 function getCacheKey(type) {
     const restaurantId = getRestaurantId();
     return `${type}_${restaurantId}`;
 }
+
+function showLoading() {
+    document.getElementById('loadingContainer').style.display = 'flex';
+    document.getElementById('categoriesView').style.display = 'none';
+    document.getElementById('menuSection').classList.remove('active');
+}
+
+function hideLoading() {
+    document.getElementById('loadingContainer').style.display = 'none';
+    document.getElementById('categoriesView').style.display = 'block';
+}
+
 function shouldFetchMenuAgain() {
     const lastFetch = localStorage.getItem(getCacheKey('lastMenuFetch'));
     if (!lastFetch) return true;
 
     const elapsedMinutes = (Date.now() - Number(lastFetch)) / (1000 * 60);
-    return elapsedMinutes > 1; // 5 dakikada bir sadece
+    return elapsedMinutes > 0;
 }
 
 async function loadMenuDataWithFallback() {
-    // First try direct connection (in case CORS is fixed)
+    // First try direct connection
     try {
         console.log('Trying direct connection...');
         const response = await fetch(ORIGINAL_URL);
@@ -55,7 +66,6 @@ async function loadMenuDataWithFallback() {
         console.log('Direct connection failed, trying proxies...');
     }
 
-    // Try different CORS proxies
     for (let i = 0; i < CORS_PROXIES.length; i++) {
         try {
             const proxyUrl = CORS_PROXIES[i] + encodeURIComponent(ORIGINAL_URL);
@@ -86,13 +96,12 @@ async function loadMenuData() {
             return;
         }
     }
-
+    showLoading();
     try {
         console.log('Loading menu data...');
         const raw = await loadMenuDataWithFallback();
         console.log('Data loaded successfully!');
 
-        // Process the data - FIX: Map the correct property names
         menuData = {};
         Object.entries(raw).forEach(([cat, items]) => {
             const cover =
@@ -107,7 +116,8 @@ async function loadMenuData() {
                     price: `${Number(it.price).toFixed(2)}₺`,
                     photo: (it.photoUrl && it.photoUrl.startsWith('http')) 
                             ? it.photoUrl 
-                            : ''  // FIX: Use photoUrl from Google Apps Script
+                            : '',
+                    onMenu: it.onMenu === true
                 }))
             };
         });
@@ -117,13 +127,13 @@ async function loadMenuData() {
         
         populateCategories();
         populateAllItems();
-        
+        hideLoading();
     } catch (error) {
         console.error('Failed to load menu data:', error);
+        hideLoading();
         alert('Menü Yüklenemedi. Lütfen internet bağlantınızı kontrol edin.');
     }
 }
-
 
 // Initialize the menu
 function initializeMenu() {
@@ -140,10 +150,9 @@ function handlePopState() {
 
     if (document.getElementById('menuSection').classList.contains('active')) {
         showCategories();
+        
         return;
     }
-
-    // Otherwise, allow normal back behavior
 }
 window.addEventListener('popstate', handlePopState);
 const ACCESS_PART = 'menu-bella';
@@ -187,16 +196,15 @@ function renderNextChunk() {
 
     // Eğer daha kategori kaldıysa sıradakileri sonra ekle
     if (index < categories.length) {
-        requestAnimationFrame(renderNextChunk); // Alternatif: setTimeout(renderNextChunk, 0);
+        requestAnimationFrame(renderNextChunk); // setTimeout(renderNextChunk, 0);
     }
 }
 
-renderNextChunk(); // ilk chunk
+renderNextChunk(); 
 }
 const ENCODED_URL = 'aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J3Tm9ISzMybjlWWUpMUDBEY1ZrR0N1bTRDMUkwNC0zMDJwVTRlb0lraG52RTAyam0tMldxUjhyN245dVlxbXgtY3QvZXhlYw==';
 const ORIGINAL_URL = `${atob(ENCODED_URL)}?key=${ACCESS_PART}`;
 
-// Populate all items for search
 function populateAllItems() {
     allItems = [];
     Object.keys(menuData).forEach(category => {
@@ -209,7 +217,6 @@ function populateAllItems() {
     });
 }
 
-// Show specific category
 function showCategory(category) {
     document.getElementById('categoriesView').style.display = 'none';
     document.getElementById('menuSection').classList.add('active');
@@ -219,7 +226,9 @@ function showCategory(category) {
     const menuItems = document.getElementById('menuItems');
     menuItems.innerHTML = '';
 
-    const items = menuData[category].items;
+    const items = [...menuData[category].items].sort((a, b) => {
+        return (a.onMenu === false) - (b.onMenu === false);
+    });
     let index = 0;
 
     function renderNextChunk() {
@@ -237,7 +246,7 @@ function showCategory(category) {
                 : `<div class="item-photo no-photo"></div>`;
 
             const menuItem = document.createElement('div');
-            menuItem.className = 'menu-item';
+            menuItem.className = 'menu-item' + (item.onMenu === false ? ' faded' : '');
             menuItem.innerHTML = `
                 ${photoDiv}
                 <div class="item-content">
@@ -256,7 +265,6 @@ function showCategory(category) {
         }
 
         menuItems.appendChild(fragment);
-
         if (index < items.length) {
             requestAnimationFrame(renderNextChunk); // Alternatif: setTimeout(renderNextChunk, 0);
         }
@@ -312,7 +320,7 @@ function displaySearchResults(items, query) {
     noResults.style.display = 'none';
     menuItems.innerHTML = '';
 
-    items.forEach(item => {
+    items.slice().sort((a, b) => (a.onMenu === false) - (b.onMenu === false)).forEach(item => {
         const hasPhoto = item.photo && item.photo.trim() !== '';
         const photoDiv = hasPhoto
             ? `<div class="item-photo" onclick="openPhotoModal('${item.photo}', '${item.name}')">
@@ -322,7 +330,7 @@ function displaySearchResults(items, query) {
 
 
         const menuItem = document.createElement('div');
-        menuItem.className = 'menu-item';
+        menuItem.className = 'menu-item' + (item.onMenu === false ? ' faded' : '');
 
 
         menuItem.innerHTML = `
