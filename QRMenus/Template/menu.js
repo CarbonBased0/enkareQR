@@ -50,7 +50,7 @@ function shouldFetchMenuAgain() {
     if (!lastFetch) return true;
 
     const elapsedMinutes = (Date.now() - Number(lastFetch)) / (1000 * 60);
-    return elapsedMinutes > 0;
+    return elapsedMinutes > 1;
 }
 
 async function loadMenuDataWithFallback() {
@@ -88,6 +88,7 @@ async function loadMenuDataWithFallback() {
 async function loadMenuData() {
     if (!shouldFetchMenuAgain()) {
         console.log('Menu is recently cached. Skipping API call.');
+        hideLoading()
         const cached = localStorage.getItem(getCacheKey('cachedMenuData'));
         if (cached) {
             menuData = JSON.parse(cached);
