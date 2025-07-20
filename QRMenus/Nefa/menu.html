@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <title>Bella Vista Restorant - Menu</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,7 +34,10 @@
             <input type="text" class="search-bar" placeholder="Menüde ara..." id="searchInput">
             <span class="search-icon">🔍</span>
         </div>
-
+        <div class="loading-container" id="loadingContainer">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Menü yükleniyor...</p>
+        </div>
         <div class="categories-view" id="categoriesView">
             <div class="categories-grid" id="categoriesGrid">
                 <!-- Categories will be populated by JavaScript -->
